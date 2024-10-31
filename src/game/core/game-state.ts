@@ -1,39 +1,87 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-import { AnimatedCharacter } from "./animated-character";
-import { AssetManager } from "./asset-manager";
+import * as YUKA from 'yuka';
+
+import { AssetManager } from "../asset-manager";
+import { Level } from "../entities/Level";
 
 export class GameState {
+  // Three stuff
   private renderer: THREE.WebGLRenderer;
-  private clock = new THREE.Clock();
-
   private scene = new THREE.Scene();
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
 
-  private animatedCharacter: AnimatedCharacter;
+  // Yuka stuff
+  private time = new YUKA.Time();
+  private entityManager = new YUKA.EntityManager();
+
+  // Game stuff
+  private level: Level;
 
   constructor(private assetManager: AssetManager) {
+    // High level
     this.renderer = this.setupRenderer();
     this.camera = this.setupCamera();
 
+    // Setup scene
     const hdri = this.assetManager.textures.get('hdri');
     this.scene.environment = hdri;
     this.scene.background = hdri;
-    this.setupLights();
-    this.setupObjects();
 
+    this.level = this.setupLevel();
+    this.setupLights();
+
+    // Controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.target.set(0, 1, 0);
 
-    this.animatedCharacter = this.setupAnimatedCharacter();
-    this.scene.add(this.animatedCharacter.object);
-    this.animatedCharacter.playAnimation("idle");
-
     // Start game
     this.update();
+  }
+
+  addEntity(entity: YUKA.GameEntity, renderComponent: THREE.Object3D) {
+    // Turn off matrix auto updates
+    renderComponent.matrixAutoUpdate = false;
+    renderComponent.updateMatrix();
+
+    renderComponent.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.matrixAutoUpdate = false;
+        child.updateMatrix();
+      }
+    });
+
+    // Add it to the scene
+    this.scene.add(renderComponent);
+
+    // Setup the sync callback
+    entity.setRenderComponent(renderComponent, sync);
+
+    // Give to entity manager
+    this.entityManager.add(entity);
+  }
+
+  removeEntity(entity: YUKA.GameEntity) {
+    // Remove the entity from manager
+    this.entityManager.remove(entity);
+
+    // Dispose of threejs render component
+    const e = entity as any;
+    if (e._renderComponent !== null) {
+      const object = e._renderComponent as THREE.Object3D;
+
+      object.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.dispose();
+          child.material.dispose();
+        }
+      });
+
+      this.scene.remove(object);
+    }
   }
 
   private setupRenderer() {
@@ -83,44 +131,39 @@ export class GameState {
     this.scene.add(directLight);
   }
 
-  private setupObjects() {
-    const box = this.assetManager.models.get("box");
-    this.scene.add(box);
-
-    // floor
+  private setupLevel() {
+    // Render component for the level is plane for now
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(20, 20),
       new THREE.MeshBasicMaterial({ color: 'grey' })
     );
     plane.rotateX(-Math.PI / 2)
-    this.scene.add(plane);
-  }
 
-  private setupAnimatedCharacter(): AnimatedCharacter {
-    const object = this.assetManager.models.get("bandit");
-    object.position.z = -0.5;
-    this.assetManager.applyModelTexture(object, "bandit");
+    const level = new Level();
+    level.name = 'level';
 
-    const mixer = new THREE.AnimationMixer(object);
-    const actions = new Map<string, THREE.AnimationAction>();
-    const idleClip = this.assetManager.animations.get("idle");
-    if (idleClip) {
-      const idleAction = mixer.clipAction(idleClip);
-      actions.set("idle", idleAction);
-    }
+    this.addEntity(level, plane);
 
-    return new AnimatedCharacter(object, mixer, actions);
+    return level;
   }
 
   private update = () => {
     requestAnimationFrame(this.update);
 
-    const dt = this.clock.getDelta();
+    this.time.update();
+    const dt = this.time.getDelta();
 
     this.controls.update();
 
-    this.animatedCharacter.update(dt);
-
+    this.renderer.clear();
     this.renderer.render(this.scene, this.camera);
   };
+}
+
+export function sync(
+  yukaEntity: YUKA.GameEntity,
+  renderComponent: THREE.Object3D
+) {
+  const matrix = yukaEntity.worldMatrix as unknown;
+  renderComponent.matrix.copy(matrix as THREE.Matrix4);
 }
