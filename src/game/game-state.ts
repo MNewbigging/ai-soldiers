@@ -1,29 +1,27 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-import { RenderPipeline } from "./render-pipeline";
 import { AnimatedCharacter } from "./animated-character";
 import { AssetManager } from "./asset-manager";
 
 export class GameState {
-  private renderPipeline: RenderPipeline;
+  private renderer: THREE.WebGLRenderer;
   private clock = new THREE.Clock();
 
   private scene = new THREE.Scene();
-  private camera = new THREE.PerspectiveCamera();
+  private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
 
   private animatedCharacter: AnimatedCharacter;
 
   constructor(private assetManager: AssetManager) {
-    this.setupCamera();
-
-    this.renderPipeline = new RenderPipeline(this.scene, this.camera);
+    this.renderer = this.setupRenderer();
+    this.camera = this.setupCamera();
 
     this.setupLights();
     this.setupObjects();
 
-    this.controls = new OrbitControls(this.camera, this.renderPipeline.canvas);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.target.set(0, 1, 0);
 
@@ -37,10 +35,42 @@ export class GameState {
     this.update();
   }
 
+  private setupRenderer() {
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 1;
+
+    document.body.appendChild(renderer.domElement);
+
+    window.addEventListener("resize", this.onCanvasResize);
+
+    return renderer;
+  }
+
+  private onCanvasResize = () => {
+    this.renderer.setSize(
+      window.innerWidth,
+      window.innerHeight,
+      false
+    );
+
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+
+    this.camera.updateProjectionMatrix();
+  };
+
   private setupCamera() {
-    this.camera.fov = 75;
-    this.camera.far = 500;
-    this.camera.position.set(0, 1.5, 3);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.5, 3);
+
+    camera.updateProjectionMatrix();
+
+    return camera;
   }
 
   private setupLights() {
@@ -82,6 +112,6 @@ export class GameState {
 
     this.animatedCharacter.update(dt);
 
-    this.renderPipeline.render(dt);
+    this.renderer.render(this.scene, this.camera);
   };
 }
