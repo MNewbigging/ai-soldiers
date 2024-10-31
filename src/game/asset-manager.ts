@@ -41,6 +41,22 @@ export class AssetManager {
   }
 
   private loadModels(fbxLoader: FBXLoader, gltfLoader: GLTFLoader) {
+    // american soldier
+
+    const asUrl = new URL('/models/Character_American_Soldier_01.fbx', import.meta.url).href;
+    fbxLoader.load(asUrl, group => {
+      group.scale.multiplyScalar(0.01);
+      this.models.set('soldier-am', group);
+    });
+
+    // american rifle
+
+    const arUrl = new URL('/models/SM_Wep_American_Rifle_01.fbx', import.meta.url).href;
+    fbxLoader.load(arUrl, group => {
+      group.scale.multiplyScalar(0.01);
+      this.models.set('rifle-am', group);
+    })
+
     // bandit
 
     const banditUrl = new URL("/models/bandit.fbx", import.meta.url).href;
@@ -79,6 +95,13 @@ export class AssetManager {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       this.textures.set("hdri", texture);
     });
+
+    // war texture 1A
+    const a1Url = new URL('/textures/PolygonWar_Texture_01_A.png', import.meta.url).href;
+    textureLoader.load(a1Url, texture => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      this.textures.set('war-1A', texture);
+    });
   }
 
   private loadAnimations(fbxLoader: FBXLoader) {
@@ -91,5 +114,15 @@ export class AssetManager {
         this.animations.set("idle", clip);
       }
     });
+
+    // rifle idle
+    const rifleIdleUrl = new URL('/anims/Rifle Idle.fbx', import.meta.url).href;
+    fbxLoader.load(rifleIdleUrl, group => {
+      if (group.animations.length) {
+        const clip = group.animations[0];
+        clip.name = 'rifle-idle';
+        this.animations.set(clip.name, clip);
+      }
+    })
   }
 }

@@ -18,14 +18,15 @@ export class GameState {
     this.renderer = this.setupRenderer();
     this.camera = this.setupCamera();
 
+    const hdri = this.assetManager.textures.get('hdri');
+    this.scene.environment = hdri;
+    this.scene.background = hdri;
     this.setupLights();
     this.setupObjects();
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.target.set(0, 1, 0);
-
-    this.scene.background = new THREE.Color("#1680AF");
 
     this.animatedCharacter = this.setupAnimatedCharacter();
     this.scene.add(this.animatedCharacter.object);
@@ -85,6 +86,14 @@ export class GameState {
   private setupObjects() {
     const box = this.assetManager.models.get("box");
     this.scene.add(box);
+
+    // floor
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(20, 20),
+      new THREE.MeshBasicMaterial({ color: 'grey' })
+    );
+    plane.rotateX(-Math.PI / 2)
+    this.scene.add(plane);
   }
 
   private setupAnimatedCharacter(): AnimatedCharacter {
