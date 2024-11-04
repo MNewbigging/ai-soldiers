@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-import * as YUKA from 'yuka';
+import * as YUKA from "yuka";
 
 import { AssetManager } from "../asset-manager";
-import { Level } from "../entities/Level";
 import { Soldier } from "../entities/soldier";
+import { Level } from "../entities/level";
 
 export class GameState {
   // Three stuff
@@ -27,7 +27,7 @@ export class GameState {
     this.camera = this.setupCamera();
 
     // Setup scene
-    const hdri = this.assetManager.textures.get('hdri');
+    const hdri = this.assetManager.textures.get("hdri");
     this.scene.environment = hdri;
     this.scene.background = hdri;
     this.setupLights();
@@ -88,7 +88,10 @@ export class GameState {
   }
 
   private setupRenderer() {
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: "high-performance",
+    });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -103,11 +106,7 @@ export class GameState {
   }
 
   private onCanvasResize = () => {
-    this.renderer.setSize(
-      window.innerWidth,
-      window.innerHeight,
-      false
-    );
+    this.renderer.setSize(window.innerWidth, window.innerHeight, false);
 
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -117,7 +116,12 @@ export class GameState {
   };
 
   private setupCamera() {
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      100
+    );
     camera.position.set(0, 1.5, 3);
 
     camera.updateProjectionMatrix();
@@ -138,12 +142,13 @@ export class GameState {
     // Render component for the level is plane for now
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(20, 20),
-      new THREE.MeshBasicMaterial({ color: 'grey' })
+      new THREE.MeshBasicMaterial({ color: "grey" })
     );
-    plane.rotateX(-Math.PI / 2)
+    plane.rotateX(-Math.PI / 2);
+    this.assetManager.applyModelTexture(plane, "floor");
 
     const level = new Level();
-    level.name = 'level';
+    level.name = "level";
 
     this.addEntity(level, plane);
 
@@ -151,8 +156,18 @@ export class GameState {
   }
 
   private spawnSoldier() {
-    const renderComp = this.assetManager.models.get('soldier-am');
-    this.assetManager.applyModelTexture(renderComp, 'war-1A');
+    const renderComp = this.assetManager.models.get("soldier-am");
+    const texture = this.assetManager.textures.get("war-1A");
+    renderComp.traverse((child: THREE.Object3D) => {
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshLambertMaterial({
+          map: texture,
+          vertexColors: false,
+          transparent: true,
+          opacity: 1,
+        });
+      }
+    });
 
     const soldier = new Soldier(renderComp);
 
