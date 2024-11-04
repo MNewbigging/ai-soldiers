@@ -5,6 +5,7 @@ import * as YUKA from 'yuka';
 
 import { AssetManager } from "../asset-manager";
 import { Level } from "../entities/Level";
+import { Soldier } from "../entities/soldier";
 
 export class GameState {
   // Three stuff
@@ -29,14 +30,16 @@ export class GameState {
     const hdri = this.assetManager.textures.get('hdri');
     this.scene.environment = hdri;
     this.scene.background = hdri;
-
-    this.level = this.setupLevel();
     this.setupLights();
 
     // Controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.target.set(0, 1, 0);
+
+    // Scene objects
+    this.level = this.setupLevel();
+    this.spawnSoldier();
 
     // Start game
     this.update();
@@ -145,6 +148,15 @@ export class GameState {
     this.addEntity(level, plane);
 
     return level;
+  }
+
+  private spawnSoldier() {
+    const renderComp = this.assetManager.models.get('soldier-am');
+    this.assetManager.applyModelTexture(renderComp, 'war-1A');
+
+    const soldier = new Soldier(renderComp);
+
+    this.addEntity(soldier, renderComp);
   }
 
   private update = () => {
