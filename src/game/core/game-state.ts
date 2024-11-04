@@ -147,10 +147,14 @@ export class GameState {
     plane.rotateX(-Math.PI / 2);
     this.assetManager.applyModelTexture(plane, "floor");
 
+    // we could rotate the yuka entity, but it only has quaternion rotation...
+    // TODO: ask Hugo how he'd go about that rotation
+    const renderComp = new THREE.Group().add(plane);
+
     const level = new Level();
     level.name = "level";
 
-    this.addEntity(level, plane);
+    this.addEntity(level, renderComp);
 
     return level;
   }
@@ -169,7 +173,7 @@ export class GameState {
       }
     });
 
-    const soldier = new Soldier(renderComp);
+    const soldier = new Soldier(renderComp, this.assetManager);
 
     this.addEntity(soldier, renderComp);
   }
@@ -181,6 +185,8 @@ export class GameState {
     const dt = this.time.getDelta();
 
     this.controls.update();
+
+    this.entityManager.update(dt);
 
     this.renderer.clear();
     this.renderer.render(this.scene, this.camera);
