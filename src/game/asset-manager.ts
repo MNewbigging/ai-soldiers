@@ -56,7 +56,6 @@ export class AssetManager {
 
   private loadModels(fbxLoader: FBXLoader, gltfLoader: GLTFLoader) {
     // american soldier
-
     const asUrl = new URL(
       "/models/Character_American_Soldier_01.fbx",
       import.meta.url
@@ -66,7 +65,6 @@ export class AssetManager {
     });
 
     // american rifle
-
     const arUrl = new URL(
       "/models/SM_Wep_American_Rifle_01.fbx",
       import.meta.url
@@ -75,36 +73,12 @@ export class AssetManager {
       group.scale.multiplyScalar(0.01);
       this.models.set("rifle-am", group);
     });
-
-    // bandit
-
-    const banditUrl = new URL("/models/bandit.fbx", import.meta.url).href;
-    fbxLoader.load(banditUrl, (group) => this.models.set("bandit", group));
-
-    // box
-    const boxUrl = new URL("/models/box-small.glb", import.meta.url).href;
-    gltfLoader.load(boxUrl, (gltf) => {
-      gltf.scene.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.material.metalness = 0; // kenney assets require this to render correctly
-        }
-      });
-      this.models.set("box", gltf.scene);
-    });
   }
 
   private loadTextures(
     rgbeLoader: RGBELoader,
     textureLoader: THREE.TextureLoader
   ) {
-    // bandit texture
-    const banditUrl = new URL("/textures/bandit-texture.png", import.meta.url)
-      .href;
-    textureLoader.load(banditUrl, (texture) => {
-      texture.colorSpace = THREE.SRGBColorSpace;
-      this.textures.set("bandit", texture);
-    });
-
     // skybox
     const orchardUrl = new URL(
       "/textures/orchard_cartoony.hdr",
@@ -134,16 +108,6 @@ export class AssetManager {
   }
 
   private loadAnimations(fbxLoader: FBXLoader) {
-    // bandit idle
-    const idleUrl = new URL("/anims/idle.fbx", import.meta.url).href;
-    fbxLoader.load(idleUrl, (group) => {
-      if (group.animations.length) {
-        const clip = group.animations[0];
-        clip.name = "idle";
-        this.animations.set("idle", clip);
-      }
-    });
-
     // rifle idle
     const rifleIdleUrl = new URL("/anims/Rifle Idle.fbx", import.meta.url).href;
     fbxLoader.load(rifleIdleUrl, (group) => {
