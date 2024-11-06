@@ -1,6 +1,6 @@
 import * as YUKA from "yuka";
 import * as THREE from "three";
-import { AssetManager } from "../asset-manager";
+import { AssetManager } from "../../asset-manager";
 
 export class Soldier extends YUKA.Vehicle {
   private mixer: THREE.AnimationMixer;

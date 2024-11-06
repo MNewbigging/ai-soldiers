@@ -4,8 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as YUKA from "yuka";
 
 import { AssetManager } from "../asset-manager";
-import { Soldier } from "../entities/soldier";
-import { Level } from "../entities/level";
+import { Soldier } from "../matt/entities/soldier";
 import { addGui } from "../../utils/utils";
 
 export class GameState {
@@ -20,7 +19,7 @@ export class GameState {
   private entityManager = new YUKA.EntityManager();
 
   // Game stuff
-  private level: Level;
+
 
   constructor(private assetManager: AssetManager) {
     // High level
@@ -39,7 +38,7 @@ export class GameState {
     this.controls.target.set(0, 1, 0);
 
     // Scene objects
-    this.level = this.setupLevel();
+    this.setupLevel();
     this.spawnSoldier();
 
     // Start game
@@ -140,24 +139,15 @@ export class GameState {
   }
 
   private setupLevel() {
-    // Render component for the level is plane for now
+    // Until we have an actual level made, just use a plane - no yuka entity needed now
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(20, 20),
-      new THREE.MeshBasicMaterial({ color: "grey" })
+      new THREE.MeshBasicMaterial()
     );
     plane.rotateX(-Math.PI / 2);
     this.assetManager.applyModelTexture(plane, "floor");
 
-    // we could rotate the yuka entity, but it only has quaternion rotation...
-    // TODO: ask Hugo how he'd go about that rotation
-    const renderComp = new THREE.Group().add(plane);
-
-    const level = new Level();
-    level.name = "level";
-
-    this.addEntity(level, renderComp);
-
-    return level;
+    this.scene.add(plane);
   }
 
   private spawnSoldier() {
