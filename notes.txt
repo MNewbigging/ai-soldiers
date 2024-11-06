@@ -1,19 +1,4 @@
-Goals for tonight:
-
-M
-- get the prototype texture on the ground
-
-- get the soldier model in the scene, textured
-
-S
-- animate with the rifle idle anim
-
-- get the weapon in the scene, textured
-
-C
-- attach the weapon to the soldier
-
-
-Next time:
-
-- Make a single goal for the soldier entity; stand still and play idle animation
+Thoughts:
+- soldier AI will differ, but animations will be the same
+- create a base class we can both extend that handles all the animation setup
+- add in german soldier model and create equal setup, use extended class

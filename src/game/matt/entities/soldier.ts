@@ -1,8 +1,11 @@
 import * as YUKA from "yuka";
 import * as THREE from "three";
 import { AssetManager } from "../../asset-manager";
+import { IdleGoalEvaluator } from "../goals/idle/idle-goal-evaluator";
 
 export class Soldier extends YUKA.Vehicle {
+  brain: YUKA.Think<Soldier>;
+
   private mixer: THREE.AnimationMixer;
   private animations = new Map<string, THREE.AnimationAction>();
   private currentAction?: THREE.AnimationAction;
@@ -13,19 +16,27 @@ export class Soldier extends YUKA.Vehicle {
   ) {
     super();
 
+    // goals
+
+    this.brain = new YUKA.Think(this);
+    this.brain.addEvaluator(new IdleGoalEvaluator());
+
     // animations
 
     this.mixer = new THREE.AnimationMixer(this.renderComponent);
     this.setupAnimations();
-
-    // For now, play the rifle idle animation by default
-    this.playAnimation("rifle-idle");
   }
 
   override update(delta: number): this {
     super.update(delta);
 
     this.mixer.update(delta);
+
+    // Update current goal
+    this.brain.execute();
+
+    // Check for better goals
+    this.brain.arbitrate();
 
     return this;
   }
