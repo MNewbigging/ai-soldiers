@@ -59,6 +59,16 @@ export class AssetManager {
   }
 
   private loadModels(fbxLoader: FBXLoader, gltfLoader: GLTFLoader) {
+    /**
+     * Note on character models:
+     * - they have been uploaded to mixamo
+     * - viewed and downloaded anims using that model on mixamo
+     * - mixamo edits the bones when you upload, so the first anim is downloaded with skin
+     * - this skinned anim is used as the model (renamed back to original synty name)
+     * - e.g american soldier was uploaded to mixamo, picked an anim and downloaded with skin,
+     * - we still download anims separately though
+     */
+
     // american soldier
     const asUrl = new URL(
       "/models/Character_American_Soldier_01.fbx",
@@ -67,13 +77,6 @@ export class AssetManager {
     fbxLoader.load(asUrl, (group) => {
       this.models.set("soldier-am", group);
     });
-
-    // soldier test - downloaded from mixamo with included anim
-    // because mixamo will rename bones and anims should work better
-    const soldierUrl = new URL('/models/soldier.fbx', import.meta.url).href;
-    fbxLoader.load(soldierUrl, group => {
-      this.models.set('soldier', group);
-    })
 
     // american submachine gun
     const arUrl = new URL(

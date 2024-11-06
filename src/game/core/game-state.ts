@@ -41,7 +41,6 @@ export class GameState {
     // Scene objects
     this.level = this.setupLevel();
     this.spawnSoldier();
-    this.spawnSoldier2();
 
     // Start game
     this.update();
@@ -178,12 +177,11 @@ export class GameState {
     const smg = this.assetManager.cloneModel('smg-am');
     this.assetManager.applyModelTexture(smg, 'war-1A');
     smg.scale.multiplyScalar(100);
-    smg.rotateX(-Math.PI / 2);
-    smg.rotateY(-Math.PI / 2);
-    smg.position.x = -6.2;
+    smg.rotateX(Math.PI * 1.1);
+    smg.rotateY(-Math.PI * 0.6);
+    smg.rotateZ(-Math.PI * 0.51);
+    smg.position.set(-8, 2, -2);
     renderComp.getObjectByName('Hand_R')?.add(smg);
-
-    addGui(smg);
 
     const soldier = new Soldier(renderComp, this.assetManager);
 
