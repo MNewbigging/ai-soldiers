@@ -11,6 +11,10 @@ export class AssetManager {
 
   private loadingManager = new THREE.LoadingManager();
 
+  getModel(name: string) {
+    return this.models.get(name) as THREE.Object3D;
+  }
+
   cloneModel(name: string): THREE.Object3D {
     const model = this.models.get(name);
     if (model) {
@@ -64,14 +68,20 @@ export class AssetManager {
       this.models.set("soldier-am", group);
     });
 
-    // american rifle
+    // soldier test - downloaded from mixamo with included anim
+    // because mixamo will rename bones and anims should work better
+    const soldierUrl = new URL('/models/soldier.fbx', import.meta.url).href;
+    fbxLoader.load(soldierUrl, group => {
+      this.models.set('soldier', group);
+    })
+
+    // american submachine gun
     const arUrl = new URL(
-      "/models/SM_Wep_American_Rifle_01.fbx",
+      "/models/SM_Wep_American_SubMachineGun_01.fbx",
       import.meta.url
     ).href;
     fbxLoader.load(arUrl, (group) => {
-      group.scale.multiplyScalar(0.01);
-      this.models.set("rifle-am", group);
+      this.models.set("smg-am", group);
     });
   }
 

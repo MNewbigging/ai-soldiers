@@ -6,6 +6,7 @@ import * as YUKA from "yuka";
 import { AssetManager } from "../asset-manager";
 import { Soldier } from "../entities/soldier";
 import { Level } from "../entities/level";
+import { addGui } from "../../utils/utils";
 
 export class GameState {
   // Three stuff
@@ -40,6 +41,7 @@ export class GameState {
     // Scene objects
     this.level = this.setupLevel();
     this.spawnSoldier();
+    this.spawnSoldier2();
 
     // Start game
     this.update();
@@ -160,7 +162,7 @@ export class GameState {
   }
 
   private spawnSoldier() {
-    const renderComp = this.assetManager.models.get("soldier-am");
+    const renderComp = this.assetManager.models.get("soldier-am") as THREE.Object3D;
     const texture = this.assetManager.textures.get("war-1A");
     renderComp.traverse((child: THREE.Object3D) => {
       if (child instanceof THREE.Mesh) {
@@ -173,7 +175,45 @@ export class GameState {
       }
     });
 
+    const smg = this.assetManager.cloneModel('smg-am');
+    this.assetManager.applyModelTexture(smg, 'war-1A');
+    smg.scale.multiplyScalar(100);
+    smg.rotateX(-Math.PI / 2);
+    smg.rotateY(-Math.PI / 2);
+    smg.position.x = -6.2;
+    renderComp.getObjectByName('Hand_R')?.add(smg);
+
+    addGui(smg);
+
     const soldier = new Soldier(renderComp, this.assetManager);
+
+    this.addEntity(soldier, renderComp);
+  }
+
+  private spawnSoldier2() {
+    const renderComp = this.assetManager.getModel('soldier');
+    const texture = this.assetManager.textures.get("war-1A");
+    renderComp.traverse((child: THREE.Object3D) => {
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshLambertMaterial({
+          map: texture,
+          vertexColors: false,
+          transparent: true,
+          opacity: 1,
+        });
+      }
+    });
+
+    const smg = this.assetManager.cloneModel('smg-am');
+    this.assetManager.applyModelTexture(smg, 'war-1A');
+    smg.scale.multiplyScalar(100);
+    smg.rotateX(-Math.PI / 2);
+    smg.rotateY(-Math.PI / 2);
+    smg.position.x = -6.2;
+    renderComp.getObjectByName('Hand_R')?.add(smg);
+
+    const soldier = new Soldier(renderComp, this.assetManager);
+    soldier.position.x = 2;
 
     this.addEntity(soldier, renderComp);
   }
