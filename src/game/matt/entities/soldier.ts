@@ -63,7 +63,7 @@ export class Soldier extends YUKA.Vehicle {
   private setupAnimations() {
     const { animations } = this.assetManager;
 
-    const rifleIdleClip = animations.get("rifle-idle");
+    const rifleIdleClip = animations.get("rifle-idle-1");
     const rifleIdleAction = this.mixer.clipAction(rifleIdleClip);
     this.animations.set(rifleIdleClip.name, rifleIdleAction);
   }

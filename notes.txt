@@ -2,3 +2,8 @@ Thoughts:
 - soldier AI will differ, but animations will be the same
 - create a base class we can both extend that handles all the animation setup
 - add in german soldier model and create equal setup, use extended class
+
+
+- add in german soldier and gun
+- copy over the same idle anim and goal
+- create a flat arena, using more floor textures

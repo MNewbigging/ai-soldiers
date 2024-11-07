@@ -18,8 +18,7 @@ export class GameState {
   private time = new YUKA.Time();
   private entityManager = new YUKA.EntityManager();
 
-  // Game stuff
-
+  mixer: THREE.AnimationMixer;
 
   constructor(private assetManager: AssetManager) {
     // High level
@@ -39,7 +38,35 @@ export class GameState {
 
     // Scene objects
     this.setupLevel();
-    this.spawnSoldier();
+    this.spawnSoldier(new YUKA.Vector3(2, 0,));
+
+    // Testing german soldier
+    const soldier = assetManager.cloneModel('soldier-de');
+    const texture = assetManager.textures.get('war-1A');
+    soldier.traverse(child => {
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshLambertMaterial({
+          map: texture,
+          vertexColors: false
+        });
+      }
+    });
+
+    const rifle = assetManager.getTexturedModel('rifle-de', 'war-1A');
+    rifle.scale.multiplyScalar(100);
+    rifle.rotateX(Math.PI * 1.1);
+    rifle.rotateY(-Math.PI * 0.6);
+    rifle.rotateZ(-Math.PI * 0.51);
+    rifle.position.set(-8, 2, -2);
+    soldier.getObjectByName('Hand_R')?.add(rifle);
+
+    this.mixer = new THREE.AnimationMixer(soldier);
+    const idleClip = assetManager.animations.get('rifle-idle-1');
+    const idleAction = this.mixer.clipAction(idleClip);
+    idleAction.play();
+
+    this.scene.add(soldier);
+
 
     // Start game
     this.update();
@@ -150,7 +177,7 @@ export class GameState {
     this.scene.add(plane);
   }
 
-  private spawnSoldier() {
+  private spawnSoldier(position: YUKA.Vector3) {
     const renderComp = this.assetManager.models.get("soldier-am") as THREE.Object3D;
     const texture = this.assetManager.textures.get("war-1A");
     renderComp.traverse((child: THREE.Object3D) => {
@@ -158,8 +185,6 @@ export class GameState {
         child.material = new THREE.MeshLambertMaterial({
           map: texture,
           vertexColors: false,
-          transparent: true,
-          opacity: 1,
         });
       }
     });
@@ -173,7 +198,9 @@ export class GameState {
     smg.position.set(-8, 2, -2);
     renderComp.getObjectByName('Hand_R')?.add(smg);
 
+
     const soldier = new Soldier(renderComp, this.assetManager);
+    soldier.position.copy(position);
 
     this.addEntity(soldier, renderComp);
   }
@@ -215,6 +242,8 @@ export class GameState {
     this.controls.update();
 
     this.entityManager.update(dt);
+
+    this.mixer.update(dt);
 
     this.renderer.clear();
     this.renderer.render(this.scene, this.camera);

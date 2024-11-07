@@ -15,6 +15,12 @@ export class AssetManager {
     return this.models.get(name) as THREE.Object3D;
   }
 
+  getTexturedModel(modelName: string, textureName: string) {
+    const model = this.cloneModel(modelName);
+    this.applyModelTexture(model, textureName);
+    return model;
+  }
+
   cloneModel(name: string): THREE.Object3D {
     const model = this.models.get(name);
     if (model) {
@@ -60,13 +66,11 @@ export class AssetManager {
 
   private loadModels(fbxLoader: FBXLoader, gltfLoader: GLTFLoader) {
     /**
-     * Note on character models:
-     * - they have been uploaded to mixamo
-     * - viewed and downloaded anims using that model on mixamo
-     * - mixamo edits the bones when you upload, so the first anim is downloaded with skin
-     * - this skinned anim is used as the model (renamed back to original synty name)
-     * - e.g american soldier was uploaded to mixamo, picked an anim and downloaded with skin,
-     * - we still download anims separately though
+     * Note on character models:     
+     * You first have to upload the model to mixamo, apply any animation, then download
+     * with skin to use as the base model. Then download all anims separately without skin.
+     * This is because mixamo edits the bone names to match the anim, without it the anims 
+     * won't always work (they'll not find certain bones)
      */
 
     // american soldier
@@ -86,6 +90,18 @@ export class AssetManager {
     fbxLoader.load(arUrl, (group) => {
       this.models.set("smg-am", group);
     });
+
+    // german soldier
+    const gsUrl = new URL('/models/Character_German_Soldier_01.fbx', import.meta.url).href;
+    fbxLoader.load(gsUrl, group => {
+      this.models.set('soldier-de', group);
+    });
+
+    // german assault rifle
+    const germanArUrl = new URL('/models/SM_Wep_German_AssaultRifle_01.fbx', import.meta.url).href;
+    fbxLoader.load(germanArUrl, group => {
+      this.models.set('rifle-de', group);
+    })
   }
 
   private loadTextures(
@@ -122,11 +138,20 @@ export class AssetManager {
 
   private loadAnimations(fbxLoader: FBXLoader) {
     // rifle idle
-    const rifleIdleUrl = new URL("/anims/Rifle Idle.fbx", import.meta.url).href;
+    const rifleIdleUrl = new URL("/anims/rifle-idle-1.fbx", import.meta.url).href;
     fbxLoader.load(rifleIdleUrl, (group) => {
       if (group.animations.length) {
         const clip = group.animations[0];
-        clip.name = "rifle-idle";
+        clip.name = "rifle-idle-1";
+        this.animations.set(clip.name, clip);
+      }
+    });
+
+    const rifleIdle2Url = new URL('/anims/rifle-idle-2.fbx', import.meta.url).href;
+    fbxLoader.load(rifleIdle2Url, group => {
+      if (group.animations.length) {
+        const clip = group.animations[0];
+        clip.name = 'rifle-idle-2';
         this.animations.set(clip.name, clip);
       }
     });

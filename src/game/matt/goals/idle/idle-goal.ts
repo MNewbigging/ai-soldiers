@@ -8,7 +8,7 @@ export class IdleGoal extends YUKA.Goal<Soldier> {
 
   override activate(): void {
     // Play the idle animation
-    this.owner.playAnimation('rifle-idle');
+    this.owner.playAnimation('rifle-idle-1');
   }
 
   override terminate(): void {
