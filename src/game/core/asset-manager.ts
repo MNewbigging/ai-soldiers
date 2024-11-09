@@ -118,7 +118,9 @@ export class AssetManager {
     alias: string,
     onLoad?: (group: THREE.Group) => void
   ) {
-    const url = new URL(`/models/${filename}.fbx`, import.meta.url).href;
+    const path = `${getPathPrefix()}/models/${filename}.fbx`;
+    const url = getUrl(path);
+    console.log("test 3");
 
     fbxLoader.load(url, (group: THREE.Group) => {
       onLoad?.(group);
@@ -164,7 +166,7 @@ export class AssetManager {
     alias: string,
     onLoad?: (texture: THREE.Texture) => void
   ) {
-    const path = `/textures/${filename}`;
+    const path = `${getPathPrefix()}/textures/${filename}`;
     const url = getUrl(path);
     loader.load(url, (texture) => {
       onLoad?.(texture);
@@ -194,6 +196,12 @@ export class AssetManager {
       }
     });
   }
+}
+
+function getPathPrefix() {
+  // Using template strings to create url paths breaks on github pages
+  // We need to manually add the required /repo/ prefix to the path if not on localhost
+  return location.hostname === "localhost" ? "" : "/ai-soldiers";
 }
 
 function getUrl(path: string) {
