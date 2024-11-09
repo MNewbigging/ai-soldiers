@@ -1,8 +1,8 @@
 import * as YUKA from "yuka";
-import { SoldierUS } from "../../entities/soldier-us";
+import { SoldierDE } from "../entities/soldier-de";
 
-export class IdleGoal extends YUKA.Goal<SoldierUS> {
-  constructor(public owner: SoldierUS) {
+export class IdleGoal extends YUKA.Goal<SoldierDE> {
+  constructor(public owner: SoldierDE) {
     super();
   }
 

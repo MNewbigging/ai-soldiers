@@ -1,13 +1,14 @@
 import * as YUKA from "yuka";
-import { SoldierUS } from "../../entities/soldier-us";
-import { IdleGoal } from "./idle-goal";
 
-export class IdleGoalEvaluator extends YUKA.GoalEvaluator<SoldierUS> {
-  override calculateDesirability(owner: SoldierUS): number {
+import { IdleGoal } from "./idle-goal";
+import { SoldierDE } from "../entities/soldier-de";
+
+export class IdleGoalEvaluator extends YUKA.GoalEvaluator<SoldierDE> {
+  override calculateDesirability(owner: SoldierDE): number {
     return 1;
   }
 
-  override setGoal(owner: SoldierUS): void {
+  override setGoal(owner: SoldierDE): void {
     const currentGoal = owner.brain.currentSubgoal();
 
     if (currentGoal instanceof IdleGoal) {
