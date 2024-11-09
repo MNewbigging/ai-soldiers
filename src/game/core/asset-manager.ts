@@ -118,8 +118,7 @@ export class AssetManager {
     alias: string,
     onLoad?: (group: THREE.Group) => void
   ) {
-    const path = `/models/${filename}.fbx`;
-    const url = getUrl(path);
+    const url = new URL(`/models/${filename}.fbx`, import.meta.url).href;
 
     fbxLoader.load(url, (group: THREE.Group) => {
       onLoad?.(group);
@@ -167,7 +166,10 @@ export class AssetManager {
   ) {
     const path = `/textures/${filename}`;
     const url = getUrl(path);
-    //loader.load(url, )
+    loader.load(url, (texture) => {
+      onLoad?.(texture);
+      this.textures.set(alias, texture);
+    });
   }
 
   private loadAnimations(fbxLoader: FBXLoader) {
