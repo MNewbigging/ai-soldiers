@@ -1,6 +1,6 @@
 import { GameState } from "../game/core/game-state";
 import { action, makeAutoObservable, observable } from "mobx";
-import { AssetManager } from "../game/asset-manager";
+import { AssetManager } from "../game/core/asset-manager";
 
 export class AppState {
   @observable loaded = false;

@@ -1,14 +1,14 @@
 import * as YUKA from "yuka";
-import { Soldier } from "../../entities/soldier";
+import { SoldierUS } from "../../entities/soldier-us";
 
-export class IdleGoal extends YUKA.Goal<Soldier> {
-  constructor(public owner: Soldier) {
+export class IdleGoal extends YUKA.Goal<SoldierUS> {
+  constructor(public owner: SoldierUS) {
     super();
   }
 
   override activate(): void {
     // Play the idle animation
-    this.owner.playAnimation('rifle-idle-1');
+    this.owner.playAnimation("rifle-idle-1");
   }
 
   override terminate(): void {

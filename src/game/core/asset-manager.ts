@@ -66,10 +66,10 @@ export class AssetManager {
 
   private loadModels(fbxLoader: FBXLoader, gltfLoader: GLTFLoader) {
     /**
-     * Note on character models:     
+     * Note on character models:
      * You first have to upload the model to mixamo, apply any animation, then download
      * with skin to use as the base model. Then download all anims separately without skin.
-     * This is because mixamo edits the bone names to match the anim, without it the anims 
+     * This is because mixamo edits the bone names to match the anim, without it the anims
      * won't always work (they'll not find certain bones)
      */
 
@@ -92,16 +92,37 @@ export class AssetManager {
     });
 
     // german soldier
-    const gsUrl = new URL('/models/Character_German_Soldier_01.fbx', import.meta.url).href;
-    fbxLoader.load(gsUrl, group => {
-      this.models.set('soldier-de', group);
+    const gsUrl = new URL(
+      "/models/Character_German_Soldier_01.fbx",
+      import.meta.url
+    ).href;
+    fbxLoader.load(gsUrl, (group) => {
+      this.models.set("soldier-de", group);
     });
 
     // german assault rifle
-    const germanArUrl = new URL('/models/SM_Wep_German_AssaultRifle_01.fbx', import.meta.url).href;
-    fbxLoader.load(germanArUrl, group => {
-      this.models.set('rifle-de', group);
-    })
+    const germanArUrl = new URL(
+      "/models/SM_Wep_German_AssaultRifle_01.fbx",
+      import.meta.url
+    ).href;
+    fbxLoader.load(germanArUrl, (group) => {
+      this.models.set("rifle-de", group);
+    });
+  }
+
+  private loadModel(
+    fbxLoader: FBXLoader,
+    filename: string,
+    alias: string,
+    onLoad?: (group: THREE.Group) => void
+  ) {
+    const path = `/models/${filename}.fbx`;
+    const url = getUrl(path);
+
+    fbxLoader.load(url, (group: THREE.Group) => {
+      onLoad?.(group);
+      this.models.set(alias, group);
+    });
   }
 
   private loadTextures(
@@ -138,7 +159,8 @@ export class AssetManager {
 
   private loadAnimations(fbxLoader: FBXLoader) {
     // rifle idle
-    const rifleIdleUrl = new URL("/anims/rifle-idle-1.fbx", import.meta.url).href;
+    const rifleIdleUrl = new URL("/anims/rifle-idle-1.fbx", import.meta.url)
+      .href;
     fbxLoader.load(rifleIdleUrl, (group) => {
       if (group.animations.length) {
         const clip = group.animations[0];
@@ -147,13 +169,18 @@ export class AssetManager {
       }
     });
 
-    const rifleIdle2Url = new URL('/anims/rifle-idle-2.fbx', import.meta.url).href;
-    fbxLoader.load(rifleIdle2Url, group => {
+    const rifleIdle2Url = new URL("/anims/rifle-idle-2.fbx", import.meta.url)
+      .href;
+    fbxLoader.load(rifleIdle2Url, (group) => {
       if (group.animations.length) {
         const clip = group.animations[0];
-        clip.name = 'rifle-idle-2';
+        clip.name = "rifle-idle-2";
         this.animations.set(clip.name, clip);
       }
     });
   }
+}
+
+function getUrl(path: string) {
+  return new URL(path, import.meta.url).href;
 }

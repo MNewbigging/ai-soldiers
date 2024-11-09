@@ -3,9 +3,10 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 import * as YUKA from "yuka";
 
-import { AssetManager } from "../asset-manager";
-import { Soldier } from "../matt/entities/soldier";
+import { AssetManager } from "./asset-manager";
 import { addGui } from "../../utils/utils";
+import { SoldierUS } from "../americans/entities/soldier-us";
+import { SoldierDE } from "../germans/entities/soldier-de";
 
 export class GameState {
   // Three stuff
@@ -17,8 +18,6 @@ export class GameState {
   // Yuka stuff
   private time = new YUKA.Time();
   private entityManager = new YUKA.EntityManager();
-
-  mixer: THREE.AnimationMixer;
 
   constructor(private assetManager: AssetManager) {
     // High level
@@ -38,35 +37,8 @@ export class GameState {
 
     // Scene objects
     this.setupLevel();
-    this.spawnSoldier(new YUKA.Vector3(2, 0,));
-
-    // Testing german soldier
-    const soldier = assetManager.cloneModel('soldier-de');
-    const texture = assetManager.textures.get('war-1A');
-    soldier.traverse(child => {
-      if (child instanceof THREE.Mesh) {
-        child.material = new THREE.MeshLambertMaterial({
-          map: texture,
-          vertexColors: false
-        });
-      }
-    });
-
-    const rifle = assetManager.getTexturedModel('rifle-de', 'war-1A');
-    rifle.scale.multiplyScalar(100);
-    rifle.rotateX(Math.PI * 1.1);
-    rifle.rotateY(-Math.PI * 0.6);
-    rifle.rotateZ(-Math.PI * 0.51);
-    rifle.position.set(-8, 2, -2);
-    soldier.getObjectByName('Hand_R')?.add(rifle);
-
-    this.mixer = new THREE.AnimationMixer(soldier);
-    const idleClip = assetManager.animations.get('rifle-idle-1');
-    const idleAction = this.mixer.clipAction(idleClip);
-    idleAction.play();
-
-    this.scene.add(soldier);
-
+    this.spawnSoldierUS(new YUKA.Vector3(0, 0, -5));
+    this.spawnSoldierDE(new YUKA.Vector3(0, 0, 5));
 
     // Start game
     this.update();
@@ -149,7 +121,7 @@ export class GameState {
       0.1,
       100
     );
-    camera.position.set(0, 1.5, 3);
+    camera.position.set(-10, 5, 0);
 
     camera.updateProjectionMatrix();
 
@@ -177,8 +149,10 @@ export class GameState {
     this.scene.add(plane);
   }
 
-  private spawnSoldier(position: YUKA.Vector3) {
-    const renderComp = this.assetManager.models.get("soldier-am") as THREE.Object3D;
+  private spawnSoldierUS(position: YUKA.Vector3) {
+    const renderComp = this.assetManager.models.get(
+      "soldier-am"
+    ) as THREE.Object3D;
     const texture = this.assetManager.textures.get("war-1A");
     renderComp.traverse((child: THREE.Object3D) => {
       if (child instanceof THREE.Mesh) {
@@ -189,24 +163,23 @@ export class GameState {
       }
     });
 
-    const smg = this.assetManager.cloneModel('smg-am');
-    this.assetManager.applyModelTexture(smg, 'war-1A');
+    const smg = this.assetManager.cloneModel("smg-am");
+    this.assetManager.applyModelTexture(smg, "war-1A");
     smg.scale.multiplyScalar(100);
     smg.rotateX(Math.PI * 1.1);
     smg.rotateY(-Math.PI * 0.6);
     smg.rotateZ(-Math.PI * 0.51);
     smg.position.set(-8, 2, -2);
-    renderComp.getObjectByName('Hand_R')?.add(smg);
+    renderComp.getObjectByName("Hand_R")?.add(smg);
 
-
-    const soldier = new Soldier(renderComp, this.assetManager);
+    const soldier = new SoldierUS(renderComp, this.assetManager);
     soldier.position.copy(position);
 
     this.addEntity(soldier, renderComp);
   }
 
-  private spawnSoldier2() {
-    const renderComp = this.assetManager.getModel('soldier');
+  private spawnSoldierDE(position: YUKA.Vector3) {
+    const renderComp = this.assetManager.getModel("soldier-de");
     const texture = this.assetManager.textures.get("war-1A");
     renderComp.traverse((child: THREE.Object3D) => {
       if (child instanceof THREE.Mesh) {
@@ -219,16 +192,19 @@ export class GameState {
       }
     });
 
-    const smg = this.assetManager.cloneModel('smg-am');
-    this.assetManager.applyModelTexture(smg, 'war-1A');
-    smg.scale.multiplyScalar(100);
-    smg.rotateX(-Math.PI / 2);
-    smg.rotateY(-Math.PI / 2);
-    smg.position.x = -6.2;
-    renderComp.getObjectByName('Hand_R')?.add(smg);
+    const rifle = this.assetManager.cloneModel("rifle-de");
+    this.assetManager.applyModelTexture(rifle, "war-1A");
+    rifle.scale.multiplyScalar(100);
+    rifle.rotateX(-Math.PI / 2);
+    rifle.rotateY(-Math.PI / 2);
+    rifle.position.x = -6.2;
+    renderComp.getObjectByName("Hand_R")?.add(rifle);
 
-    const soldier = new Soldier(renderComp, this.assetManager);
-    soldier.position.x = 2;
+    const soldier = new SoldierDE(renderComp, this.assetManager);
+    soldier.position.copy(position);
+
+    // Hardcoding this rotation for now so it faces other soldier...
+    soldier.rotation.fromEuler(0, -Math.PI, 0);
 
     this.addEntity(soldier, renderComp);
   }
@@ -242,8 +218,6 @@ export class GameState {
     this.controls.update();
 
     this.entityManager.update(dt);
-
-    this.mixer.update(dt);
 
     this.renderer.clear();
     this.renderer.render(this.scene, this.camera);

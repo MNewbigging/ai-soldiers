@@ -1,10 +1,10 @@
 import * as YUKA from "yuka";
 import * as THREE from "three";
-import { AssetManager } from "../../asset-manager";
+import { AssetManager } from "../../core/asset-manager";
 import { IdleGoalEvaluator } from "../goals/idle/idle-goal-evaluator";
 
-export class Soldier extends YUKA.Vehicle {
-  brain: YUKA.Think<Soldier>;
+export class SoldierUS extends YUKA.Vehicle {
+  brain: YUKA.Think<SoldierUS>;
 
   private mixer: THREE.AnimationMixer;
   private animations = new Map<string, THREE.AnimationAction>();
