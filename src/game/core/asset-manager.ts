@@ -74,13 +74,15 @@ export class AssetManager {
      */
 
     // american soldier
-    const asUrl = new URL(
-      "/models/Character_American_Soldier_01.fbx",
-      import.meta.url
-    ).href;
-    fbxLoader.load(asUrl, (group) => {
-      this.models.set("soldier-am", group);
-    });
+    // const asUrl = new URL(
+    //   "/models/Character_American_Soldier_01.fbx",
+    //   import.meta.url
+    // ).href;
+    // fbxLoader.load(asUrl, (group) => {
+    //   this.models.set("soldier-am", group);
+    // });
+
+    this.loadModel(fbxLoader, "Character_American_Soldier_01", "soldier-am");
 
     // american submachine gun
     const arUrl = new URL(
@@ -155,6 +157,17 @@ export class AssetManager {
       texture.colorSpace = THREE.SRGBColorSpace;
       this.textures.set("floor", texture);
     });
+  }
+
+  private loadTexture(
+    loader: RGBELoader | THREE.TextureLoader,
+    filename: string, // includes the extension since it might differ between textures
+    alias: string,
+    onLoad?: (texture: THREE.Texture) => void
+  ) {
+    const path = `/textures/${filename}`;
+    const url = getUrl(path);
+    //loader.load(url, )
   }
 
   private loadAnimations(fbxLoader: FBXLoader) {
