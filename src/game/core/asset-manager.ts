@@ -124,8 +124,14 @@ export class AssetManager {
   }
 
   private loadAnimations(fbxLoader: FBXLoader) {
-    this.loadAnimation(fbxLoader, "rifle-idle-1", "rifle-idle-1");
-    this.loadAnimation(fbxLoader, "rifle-idle-2", "rifle-idle-2");
+    /**
+     * These animations were taken from mixamo, using default animation properties/values
+     * The hands/guns don't really align, but we can solve that later (IK?)
+     */
+    this.loadAnimation(fbxLoader, "Rifle Idle", "rifle-idle");
+    this.loadAnimation(fbxLoader, "Rifle Down To Aim", "rifle-down-to-aim");
+    this.loadAnimation(fbxLoader, "Rifle Aiming Idle", "rifle-aiming-idle");
+    this.loadAnimation(fbxLoader, "Rifle Aim To Down", "rifle-aim-to-down");
   }
 
   private loadAnimation(loader: FBXLoader, filename: string, alias: string) {
