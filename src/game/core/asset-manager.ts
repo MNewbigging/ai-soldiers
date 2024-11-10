@@ -74,7 +74,7 @@ export class AssetManager {
      */
 
     this.loadModel(fbxLoader, "Character_American_Soldier_01", "soldier-am");
-    this.loadModel(fbxLoader, "SM_Wep_American_SubMachineGun_01", "smg-am");
+    this.loadModel(fbxLoader, "SM_Wep_American_SubMachineGun_01", "rifle-am");
     this.loadModel(fbxLoader, "Character_German_Soldier_01", "soldier-de");
     this.loadModel(fbxLoader, "SM_Wep_German_AssaultRifle_01", "rifle-de");
   }

@@ -163,14 +163,14 @@ export class GameState {
       }
     });
 
-    const smg = this.assetManager.cloneModel("smg-am");
-    this.assetManager.applyModelTexture(smg, "war-1A");
-    smg.scale.multiplyScalar(100);
-    smg.rotateX(Math.PI * 1.1);
-    smg.rotateY(-Math.PI * 0.6);
-    smg.rotateZ(-Math.PI * 0.51);
-    smg.position.set(-8, 2, -2);
-    renderComp.getObjectByName("Hand_R")?.add(smg);
+    const rifle = this.assetManager.cloneModel("rifle-am");
+    this.assetManager.applyModelTexture(rifle, "war-1A");
+    rifle.scale.multiplyScalar(100);
+    rifle.rotateX(Math.PI * 1.1);
+    rifle.rotateY(-Math.PI * 0.6);
+    rifle.rotateZ(-Math.PI * 0.51);
+    rifle.position.set(-8, 2, -2);
+    renderComp.getObjectByName("Hand_R")?.add(rifle);
 
     const soldier = new SoldierUS(renderComp, this.assetManager);
     soldier.position.copy(position);
@@ -195,9 +195,11 @@ export class GameState {
     const rifle = this.assetManager.cloneModel("rifle-de");
     this.assetManager.applyModelTexture(rifle, "war-1A");
     rifle.scale.multiplyScalar(100);
-    rifle.rotateX(-Math.PI / 2);
-    rifle.rotateY(-Math.PI / 2);
-    rifle.position.x = -6.2;
+    rifle.rotateX(Math.PI * 1.1);
+    rifle.rotateY(-Math.PI * 0.6);
+    rifle.rotateZ(-Math.PI * 0.51);
+    rifle.position.set(-8, 2, -2);
+
     renderComp.getObjectByName("Hand_R")?.add(rifle);
 
     const soldier = new SoldierDE(renderComp, this.assetManager);
