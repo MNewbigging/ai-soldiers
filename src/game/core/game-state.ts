@@ -7,6 +7,7 @@ import { AssetManager } from "./asset-manager";
 import { addGui } from "../../utils/utils";
 import { SoldierUS } from "../americans/entities/soldier-us";
 import { SoldierDE } from "../germans/entities/soldier-de";
+import { Target } from "./target";
 
 export class GameState {
   // Three stuff
@@ -39,6 +40,8 @@ export class GameState {
     this.setupLevel();
     this.spawnSoldierUS(new YUKA.Vector3(0, 0, -5));
     this.spawnSoldierDE(new YUKA.Vector3(0, 0, 5));
+
+    this.spawnTarget(new YUKA.Vector3(0, 2, 0));
 
     // Start game
     this.update();
@@ -209,6 +212,18 @@ export class GameState {
     soldier.rotation.fromEuler(0, -Math.PI, 0);
 
     this.addEntity(soldier, renderComp);
+  }
+
+  private spawnTarget(position: YUKA.Vector3) {
+    const renderComp = new THREE.Mesh(
+      new THREE.BoxGeometry(0.2, 0.2, 0.2),
+      new THREE.MeshBasicMaterial({ color: "cyan" })
+    );
+
+    const target = new Target();
+    target.position.copy(position);
+
+    this.addEntity(target, renderComp);
   }
 
   private update = () => {
