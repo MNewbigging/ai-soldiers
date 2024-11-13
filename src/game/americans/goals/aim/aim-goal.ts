@@ -17,17 +17,8 @@ export class AimGoal extends YUKA.Goal<SoldierUS> {
   override execute(): void {
     // Turn to face the target, so long as it's in sight/range...
     if (this.owner?.target) {
-      // Only want to rotate on the y axis...
-      const currentRot = this.owner.rotation.clone();
-      const lookDir = this.owner.target.position
-        .clone()
-        .sub(this.owner.position)
-        .normalize();
-      currentRot.lookAt(this.owner.forward, lookDir, YUKA.WorldUp);
-
-      // const newFacing = currentRot.toEuler({ x: 0, y: 0, z: 0});
-      // this.owner.rotation.
-      this.owner?.rotateTo(this.owner.target.position, 0.17, 0.01);
+      // Should only rotate on the y axis, not all...
+      this.owner.lookAt(this.owner.target.position);
     }
   }
 
