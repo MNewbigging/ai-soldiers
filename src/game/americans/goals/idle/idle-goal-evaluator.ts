@@ -4,7 +4,8 @@ import { IdleGoal } from "./idle-goal";
 
 export class IdleGoalEvaluator extends YUKA.GoalEvaluator<SoldierUS> {
   override calculateDesirability(owner: SoldierUS): number {
-    return 1;
+    // This is low because we generally don't want to idle
+    return 0.2;
   }
 
   override setGoal(owner: SoldierUS): void {

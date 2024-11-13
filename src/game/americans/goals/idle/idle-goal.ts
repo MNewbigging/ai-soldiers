@@ -7,11 +7,14 @@ export class IdleGoal extends YUKA.Goal<SoldierUS> {
   }
 
   override activate(): void {
+    console.log("idle goal activate");
+
     // Play the idle animation
     this.owner.playAnimation("rifle-idle");
   }
 
   override terminate(): void {
     // We don't stop anims - they get overridden by a newer anim request elsewhere
+    console.log("idle goal terminate");
   }
 }
